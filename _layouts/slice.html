@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32x32.png">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+  const sliceButton = document.getElementById('sliceButton');
+  const inputText = document.getElementById('inputText');
+  const outputDiv = document.getElementById('output');
+  const paginationDiv = document.getElementById('pagination');
+  const charLimitInput = document.getElementById('charLimit');
+  let chunks = [];
+  let currentPage = 0;
+
+  sliceButton.addEventListener('click', () => {
+    outputDiv.innerHTML = '';
+    paginationDiv.innerHTML = '';
+    const text = inputText.value;
+    const charLimit = parseInt(charLimitInput.value);
+    let startIndex = 0;
+    let chunks = [];
+
+    while (startIndex < text.length) {
+      const chunk = text.slice(startIndex, startIndex + charLimit);
+      const lastNewline = chunk.lastIndexOf('\n');
+
+      if (lastNewline !== -1 && lastNewline !== chunk.length - 1) {
+        chunks.push(chunk.slice(0, lastNewline + 1)); // Include the last newline
+        startIndex += lastNewline + 1;
+      } else {
+        chunks.push(chunk);
+        startIndex += charLimit;
+      }
+    }
+
+    createPaginationButtons(chunks);
+    showPage(0, chunks);
+  });
+
+  function showPage(pageIndex, chunks) {
+    outputDiv.textContent = chunks[pageIndex];
+  }
+
+  function createPaginationButtons(chunks) {
+    for (let i = 0; i < chunks.length; i++) {
+      const pageButton = document.createElement('button');
+      pageButton.textContent = i + 1;
+      pageButton.addEventListener('click', () => {
+        showPage(i, chunks);
+      });
+      paginationDiv.appendChild(pageButton);
+    }
+  }
+
+  function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
+  outputDiv.addEventListener('click', (event) => {
+    if (event.target.tagName === 'PRE') {
+      copyToClipboard(event.target.textContent);
+    }
+  });
+});
+    </script>
+  </head>
+
+  <body>
+    <textarea id="inputText" rows="10" placeholder="Enter your text here"></textarea>
+    <label for="charLimit">Character Limit:</label>
+    <input type="number" id="charLimit" value="3000" min="1">
+    <button id="sliceButton">Slice Text</button>
+    <div id="pagination"></div>
+    <pre id="output"></pre>
+  </body>
+</html>
