@@ -2,6 +2,21 @@
 <html>
   <head>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32x32.png">
+    <style>
+      /* Add your CSS styles here */
+      .pagination-button {
+        background-color: #ccc;
+        border: none;
+        padding: 5px 10px;
+        margin-right: 5px;
+        cursor: pointer;
+      }
+
+      .pagination-button.active {
+        background-color: #007bff;
+        color: #fff;
+      }
+    </style>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
   const sliceButton = document.getElementById('sliceButton');
@@ -39,12 +54,14 @@
 
   function showPage(pageIndex, chunks) {
     outputDiv.textContent = chunks[pageIndex];
+    updateActiveButton(pageIndex);
   }
 
   function createPaginationButtons(chunks) {
     for (let i = 0; i < chunks.length; i++) {
       const pageButton = document.createElement('button');
       pageButton.textContent = i + 1;
+      pageButton.classList.add('pagination-button');
       pageButton.addEventListener('click', () => {
         showPage(i, chunks);
       });
@@ -52,6 +69,17 @@
     }
   }
 
+  function updateActiveButton(activeIndex) {
+    const buttons = document.querySelectorAll('.pagination-button');
+    buttons.forEach((button, index) => {
+      if (index === activeIndex) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+    });
+  }
+  
   function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
     textarea.value = text;
@@ -73,7 +101,7 @@
   <body>
     <textarea id="inputText" rows="10" placeholder="Enter your text here"></textarea>
     <label for="charLimit">Character Limit:</label>
-    <input type="number" id="charLimit" value="3000" min="1">
+    <input type="number" id="charLimit" value="4000" min="1">
     <button id="sliceButton">Slice Text</button>
     <div id="pagination"></div>
     <pre id="output"></pre>
