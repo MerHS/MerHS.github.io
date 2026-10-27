@@ -1,49 +1,268 @@
----
-layout: default
----
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TRIVERZ</title>
+    <style>
+      /* 상단 / 중앙 배경색 */
+      :root {
+        --banner: #ffd400;
+        --section-bar: #070603;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        font-family: "Esamanru", Arial, sans-serif;
+        background: #fff;
+      }
 
-<div class="posts">
-  {% for post in paginator.posts %}
-    <article class="post">
-      <a href="{{ site.baseurl }}{{ post.url }}">
-        <h1>{{ post.title }}</h1>
+      @font-face {
+        font-family: "Ddag";
+        src: url("ddag.ttf") format("truetype");
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Esamanru";
+        src: url("esamanru%20Bold.ttf") format("truetype");
+        font-weight: 700;
+        font-display: swap;
+      }
 
-        <div>
-          <p class="post_date">{{ post.date | date: "%B %e, %Y" }}</p>
+      /* 상단 배너 크기 조절 */
+      .banner {
+        min-height: min(50vh, 40vw);
+        min-height: min(50dvh, 40vw); /* 창 너비가 줄면 높이도 같이 줄어듦 */
+        padding: 4vw 16px;
+        background: var(--banner);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        text-align: center;
+      }
+      /* 타이틀 왼쪽 아이콘 */
+      .banner-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2em;
+        white-space: nowrap; /* 줄바꿈 방지 */
+        font-size: min(11vw, 20vh, 8rem); /* 너비에 비례해 줄어듦 */
+      }
+      .banner-title img {
+        height: 1.5em;
+        width: auto;
+        filter: brightness(0) invert(1); /* 흰색으로 */
+      }
+      /* 한글 로고 조정 */
+      .banner h1 {
+        margin: 0;
+        font-family: "Ddag", sans-serif;
+        font-weight: 400;
+        line-height: 1;
+        font-size: 1em;
+      }
+      /* 영어 로고 조정 */
+      .banner p {
+        margin: 0.4em 0 0;
+        font-family: "Esamanru", sans-serif;
+        font-weight: 700;
+        line-height: 1;
+        font-size: 0.35em;
+        letter-spacing: 0.1em;
+        padding-left: 0.1em; /* balances trailing letter-spacing so text is truly centered */
+      }
+
+      /* 중앙 바 크기 조절 */
+      .section-bar {
+        height: min(12.667vh, 8vw);
+        height: min(12.667dvh, 8vw); /* 창 너비가 줄면 높이도 같이 줄어듦 */
+        background: var(--section-bar);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* 중앙 바 글씨 조정 */
+      .section-bar h2 {
+        margin: 0;
+        color: #fff;
+        font-weight: 700;
+        font-size: min(2.1rem, 5vw); /* 너비에 비례해 줄어듦 */
+        white-space: nowrap;
+        letter-spacing: 0.12em;
+        text-align: center;
+      }
+
+      /* 그리드 앨범 커버 갯수 조정 (화면 크기에 따라 6개 -> 3개 -> 2개) */
+      .grid {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+      }
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .cell {
+        position: relative;
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        background: #ccc;
+        overflow: hidden;
+      }
+      .cell img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .cell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .title {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        color: #fff;
+        font-size: clamp(0.9rem, 1.6vw, 1.3rem);
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .cell:hover::before,
+      .cell:focus-visible::before,
+      .cell.fixed::before {
+        opacity: 1;
+      }
+      .cell:hover .title,
+      .cell:focus-visible .title,
+      .cell.fixed .title {
+        opacity: 1;
+      }
+      .cell:focus-visible {
+        outline: 3px solid var(--banner);
+        outline-offset: -3px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <div class="banner-title">
+        <img src="img/uchuu.svg" alt="" />
+        <div class="banner-text">
+          <h1>트라이버즈</h1>
+          <p>TRIVERZ</p>
         </div>
-      </a>
-      <div class="entry">
-        {{ post.excerpt }}
       </div>
+    </header>
+    <section class="section-bar"><h2>SELECTED DISCOGRAPHY</h2></section>
 
-      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
-    </article>
-  {% endfor %}
+    <!-- 앨범 갯수를 늘리고 싶으면 <li> 블록을 복사/붙여넣기 하고 값을 조정 -->
+    <main>
+      <ul class="grid">
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_1.jpg" alt="Album Title 1" loading="lazy" /><span
+              class="title"
+              >Album Title 1</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_2.jpg" alt="Album Title 2" loading="lazy" /><span
+              class="title"
+              >Album Title 2</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_3.png" alt="Album Title 3" loading="lazy" /><span
+              class="title"
+              >Album Title 3</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_4.png" alt="Album Title 4" loading="lazy" /><span
+              class="title"
+              >Album Title 4</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_5.png" alt="Album Title 5" loading="lazy" /><span
+              class="title"
+              >Album Title 5</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_6.jpg" alt="Album Title 6" loading="lazy" /><span
+              class="title"
+              >Album Title 6</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_7.jpg" alt="Album Title 7" loading="lazy" /><span
+              class="title"
+              >Album Title 7</span
+            >
+          </button>
+        </li>
+        <li>
+          <button class="cell" type="button" aria-pressed="false">
+            <img src="img/img_8.jpg" alt="Album Title 8" loading="lazy" /><span
+              class="title"
+              >Album Title 8</span
+            >
+          </button>
+        </li>
+      </ul>
+    </main>
 
-  <!-- pagination -->
-  {% if paginator.total_pages > 1 %}
-  <div class="pagination">
-    {% if paginator.previous_page %}
-      <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&laquo; Prev</a>
-    {% else %}
-      <span>&laquo; Prev</span>
-    {% endif %}
-
-    {% for page in (1..paginator.total_pages) %}
-      {% if page == paginator.page %}
-        <span class="webjeda">{{ page }}</span>
-      {% elsif page == 1 %}
-        <a href="{{ '/' | prepend: site.baseurl | replace: '//', '/' }}">{{ page }}</a>
-      {% else %}
-        <a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
-      {% endif %}
-    {% endfor %}
-
-    {% if paginator.next_page %}
-      <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Next &raquo;</a>
-    {% else %}
-      <span>Next &raquo;</span>
-    {% endif %}
-  </div>
-  {% endif %}
-</div>
+    <script>
+      const cells = document.querySelectorAll(".cell");
+      document.addEventListener("click", (e) => {
+        const clicked = e.target.closest(".cell");
+        cells.forEach((cell) => {
+          const on = cell === clicked && !cell.classList.contains("fixed");
+          cell.classList.toggle("fixed", on);
+          cell.setAttribute("aria-pressed", String(on));
+        });
+      });
+    </script>
+  </body>
+</html>
